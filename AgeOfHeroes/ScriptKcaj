@@ -283,7 +283,7 @@ AutoFarmTab:CreateDropdown({
 
 -- Input para cantidad de puntos
 AutoFarmTab:CreateInput({
-    Name = "Cantidad de puntos a gastar (0 = infinito)",
+    Name = "Escribe la cantidad a realizar",
     PlaceholderText = "Ej: 500",
     RemoveTextAfterFocusLost = false,
     Callback = function(text)
