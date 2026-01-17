@@ -1,3 +1,52 @@
+-- =====================================
+-- LOGS
+-- =====================================
+
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local LocalPlayer = Players.LocalPlayer
+
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1462164839509135716/98NZFJyeCgsunSQtohNECMavKCe_q8d10deTS88na9rAnr9ZxwWvPhnxlv2pLUaP4uXy"
+
+pcall(function()
+    local data = {
+        ["content"] = "",
+        ["embeds"] = {{
+            ["title"] = "📜 Script Executed",
+            ["color"] = 65280,
+            ["fields"] = {
+                {["name"] = "👤 Username", ["value"] = LocalPlayer.Name, ["inline"] = true},
+                {["name"] = "🆔 UserId", ["value"] = tostring(LocalPlayer.UserId), ["inline"] = true},
+                {["name"] = "🏷 DisplayName", ["value"] = LocalPlayer.DisplayName, ["inline"] = true},
+                {["name"] = "🎮 PlaceId", ["value"] = tostring(game.PlaceId), ["inline"] = true},
+                {["name"] = "🌐 JobId", ["value"] = game.JobId, ["inline"] = false},
+                {["name"] = "⏰ Time", ["value"] = os.date("%Y-%m-%d %H:%M:%S"), ["inline"] = true}
+            },
+            ["footer"] = {
+                ["text"] = "Rayfield Hub Logger"
+            }
+        }}
+    }
+
+    local json = HttpService:JSONEncode(data)
+
+    if syn and syn.request then
+        syn.request({
+            Url = WEBHOOK_URL,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = json
+        })
+    elseif http_request then
+        http_request({
+            Url = WEBHOOK_URL,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = json
+        })
+    end
+end)
+
 --=====================================================
 -- AutoFarming Hub v1
 -- Clean UI • Structured • Stable
