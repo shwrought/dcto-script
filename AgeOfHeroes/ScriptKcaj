@@ -13,7 +13,7 @@ pcall(function()
         ["content"] = "",
         ["embeds"] = {{
             ["title"] = "📜 Autofarming Script Executed",
-            ["color"] = 65280,
+            ["color"] = 4473924,
             ["fields"] = {
                 {["name"] = "👤 Username", ["value"] = LocalPlayer.Name, ["inline"] = true},
                 {["name"] = "🆔 UserId", ["value"] = tostring(LocalPlayer.UserId), ["inline"] = true},
