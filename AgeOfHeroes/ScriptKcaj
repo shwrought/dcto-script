@@ -16,11 +16,11 @@ pcall(function()
             ["color"] = 4473924,
             ["fields"] = {
                 {["name"] = "👤 Username", ["value"] = LocalPlayer.Name, ["inline"] = true},
-                {["name"] = "🆔 UserId", ["value"] = tostring(LocalPlayer.UserId), ["inline"] = true},
-                {["name"] = "🏷 DisplayName", ["value"] = LocalPlayer.DisplayName, ["inline"] = true},
+                {["name"] = " UserId", ["value"] = tostring(LocalPlayer.UserId), ["inline"] = true},
+                {["name"] = " DisplayName", ["value"] = LocalPlayer.DisplayName, ["inline"] = true},
                 {["name"] = "🎮 PlaceId", ["value"] = tostring(game.PlaceId), ["inline"] = true},
                 {["name"] = "🌐 JobId", ["value"] = game.JobId, ["inline"] = false},
-                {["name"] = "⏰ Time", ["value"] = os.date("%Y-%m-%d %H:%M:%S"), ["inline"] = true}
+                {["name"] = " Time", ["value"] = os.date("%Y-%m-%d %H:%M:%S"), ["inline"] = true}
             },
             ["footer"] = {
                 ["text"] = "dcto loggers"
