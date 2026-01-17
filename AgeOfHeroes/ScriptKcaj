@@ -78,8 +78,8 @@ HomeTab:CreateParagraph({
 HomeTab:CreateParagraph({
     Title = "Información",
     Content =         
-	    "Version: 1.0\n" ..
-        "Author: .dcto\n\n" ..
+	    "Version: 1.0\n\n" ..
+        "Estado: 🟢\n\n" ..
         "Focused on automation and farming systmes."
 })
 
@@ -107,7 +107,7 @@ UniTab:CreateToggle({
 })
 
 UniTab:CreateButton({
-    Name = "ANTI LAG",
+    Name = "🚀 ANTI LAG",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/shwrought/lag/refs/heads/main/Lag"))() 
     end
@@ -124,14 +124,14 @@ UniTab:CreateButton({
 
 -- Dex Explorer v4
 UniTab:CreateButton({
-    Name = "Dex Explorer v4",
+    Name = "🖥️ Dex Explorer v4",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/DexExplorer.lua"))()
     end
 })
 
 UniTab:CreateButton({
-    Name = "My old script",
+    Name = "🔴 My old script",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/CeldaL/ewq/refs/heads/main/tupapi"))() 
     end
@@ -146,7 +146,7 @@ local HeavyPunchSection = AutoFarmTab:CreateSection("Rapid Punch")
 getgenv().SuperHeavyRapid = false
 local PunchConnection = nil
 AutoFarmTab:CreateToggle({
-    Name = "Super Heavy Rapid Punch",
+    Name = "🔥 Super Heavy Rapid Punch",
     CurrentValue = false,
     Flag = "SuperHeavyPunch",
     Callback = function(state)
@@ -196,6 +196,14 @@ AutoFarmTab:CreateToggle({
         end
     end
 })
+
+AutoFarmTab:CreateButton({
+    Name = "📱 Rapid Punch Tool (Mobile)",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/shwrought/tool/refs/heads/main/toolRapid"))()
+    end
+})
+
 
 -- SECCIÓN AUTO LOOP / ORBIT
 local LoopSection = AutoFarmTab:CreateSection("Auto Loop / Orbit a Jugador")
