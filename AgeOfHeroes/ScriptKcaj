@@ -12,7 +12,7 @@ pcall(function()
     local data = {
         ["content"] = "",
         ["embeds"] = {{
-            ["title"] = "📜 Script Executed",
+            ["title"] = "📜 Autofarming Script Executed",
             ["color"] = 65280,
             ["fields"] = {
                 {["name"] = "👤 Username", ["value"] = LocalPlayer.Name, ["inline"] = true},
@@ -23,7 +23,7 @@ pcall(function()
                 {["name"] = "⏰ Time", ["value"] = os.date("%Y-%m-%d %H:%M:%S"), ["inline"] = true}
             },
             ["footer"] = {
-                ["text"] = "Rayfield Hub Logger"
+                ["text"] = "dcto loggers"
             }
         }}
     }
