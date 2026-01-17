@@ -11,7 +11,7 @@
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-    Name = "autofarming HUB | v1.0",
+    Name = "autofarming HUB | v1.5",
     LoadingTitle = "Loading...",
     LoadingSubtitle = "by .dcto",
     Theme = "Bloom",           
@@ -73,6 +73,758 @@ HomeTab:CreateParagraph({
 	    "Tenkiu for using my script 💗💗" ..
         "" ..
         "" 
+})
+
+HomeTab:CreateParagraph({
+    Title = "Información",
+    Content =         
+	    "Version: 1.5\n\n" ..
+        "Estado: 🟢\n\n" ..
+        "Focused on automation and farming systmes."
+})
+
+HomeTab:CreateParagraph({
+    Title = "ChangeLogs v1.5",
+    Content =         
+	    "What do we add?\n\n" ..
+        "Spawns:\n" ..
+        "Save SpawnPoint\n." ..
+		"Noclip\n." ..
+		"Anti Fling\n\n." ..
+		"Teleports\n." ..
+		"Safezone Locations / Other Locations."
+})
+
+
+-- TAB UNIVERSAL
+local UniTab = Window:CreateTab("Universal", "globe")
+local UniSection = UniTab:CreateSection("General scripts")
+
+-- Anti AFK
+UniTab:CreateToggle({
+    Name = "Anti AFK",
+    CurrentValue = true,
+    Flag = "AntiAFK",
+    Callback = function(Value)
+        local Players = game:GetService("Players")
+        local VirtualUser = game:GetService("VirtualUser")
+        if Value then
+            Players.LocalPlayer.Idled:Connect(function()
+                VirtualUser:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+                task.wait(1)
+                VirtualUser:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+            end)
+            Rayfield:Notify({Title="Anti AFK", Content="Activado", Duration=2})
+        end
+    end,
+})
+
+UniTab:CreateButton({
+    Name = "🚀 ANTI LAG",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/shwrought/lag/refs/heads/main/Lag"))() 
+    end
+})
+
+-- Infinite Yield
+UniTab:CreateButton({
+    Name = "Infinite Yield",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+        Rayfield:Notify({Title="Infinite Yield", Content="Cargado! Presiona F9 o escribe ;", Duration=4})
+    end
+})
+
+-- Dex Explorer v4
+UniTab:CreateButton({
+    Name = "🖥️ Dex Explorer v4",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/DexExplorer.lua"))()
+    end
+})
+
+UniTab:CreateButton({
+    Name = "🔴 My old script",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/CeldaL/ewq/refs/heads/main/tupapi"))() 
+    end
+})
+
+
+-- TAB AUTOFARMING
+local AutoFarmTab = Window:CreateTab("autofarming", "zap")
+
+-- SECCIÓN SUPER HEAVY RAPID PUNCH
+local HeavyPunchSection = AutoFarmTab:CreateSection("Rapid Punch")
+getgenv().SuperHeavyRapid = false
+local PunchConnection = nil
+AutoFarmTab:CreateToggle({
+    Name = "🔥 Super Heavy Rapid Punch",
+    CurrentValue = false,
+    Flag = "SuperHeavyPunch",
+    Callback = function(state)
+        getgenv().SuperHeavyRapid = state
+        
+        local UserInputService = game:GetService("UserInputService")
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local PunchEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Punch")
+        
+        if state then
+            if not PunchConnection then
+                PunchConnection = UserInputService.InputEnded:Connect(function(input, gameProcessed)
+                    if gameProcessed then return end
+                    if not getgenv().SuperHeavyRapid then return end
+                    
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        for i = 1, 4 do
+                            task.spawn(function()
+                                for j = 1, 25 do
+                                    pcall(function()
+                                        PunchEvent:FireServer(0.4, 0.01, 1)
+                                    end)
+                                end
+                            end)
+                        end
+                    end
+                end)
+            end
+            
+            Rayfield:Notify({
+                Title = "Super Heavy Rapid ON",
+                Content = "insane hits / lag",
+                Duration = 3.5
+            })
+            
+        else
+            if PunchConnection then
+                PunchConnection:Disconnect()
+                PunchConnection = nil
+            end
+            
+            Rayfield:Notify({
+                Title = "Super Heavy Rapid OFF",
+                Content = "Rapid detenido",
+                Duration = 3
+            })
+        end
+    end
+})
+
+AutoFarmTab:CreateButton({
+    Name = "📱 Rapid Punch Tool (Mobile)",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/shwrought/tool/refs/heads/main/toolRapid"))()
+    end
+})
+
+
+-- SECCIÓN AUTO LOOP / ORBIT
+local LoopSection = AutoFarmTab:CreateSection("Auto Loop")
+getgenv().TargetPlayerName = ""
+getgenv().LoopGotoEnabled = false
+AutoFarmTab:CreateInput({
+    Name = "write the player's name for AutoLoop",
+    PlaceholderText = "Ej: alt",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        getgenv().TargetPlayerName = Text
+        local target = findTarget()
+        if target then
+            Rayfield:Notify({Title = "✓ Jugador encontrado", Content = Text .. " está online", Duration = 3})
+        else
+            Rayfield:Notify({Title = "⚠ No encontrado", Content = Text .. " no está en el server", Duration = 3})
+        end
+    end
+})
+local LoopToggle = AutoFarmTab:CreateToggle({
+    Name = "Activar Auto Loop",
+    CurrentValue = false,
+    Flag = "AutoLoop",
+    Callback = function(Value)
+        getgenv().LoopGotoEnabled = Value
+        
+        if Value then
+            if getgenv().TargetPlayerName == "" then
+                Rayfield:Notify({Title = "Error", Content = "Escribe el nombre primero", Duration = 4})
+                LoopToggle:Set(false)
+                return
+            end
+            Rayfield:Notify({Title = "Loop ACTIVADO", Content = "¡Orbitando suave!", Duration = 4})
+        else
+            Rayfield:Notify({Title = "Loop OFF", Content = "Detenido", Duration = 2})
+        end
+    end
+})
+AutoFarmTab:CreateButton({
+    Name = "Stop & Reset",
+    Callback = function()
+        getgenv().LoopGotoEnabled = false
+        LoopToggle:Set(false)
+        if LoopConnection then LoopConnection:Disconnect() end
+        Rayfield:Notify({Title = "Reset OK", Content = "Todo parado", Duration = 3})
+    end
+})
+
+-- =====================================
+-- NUEVA SECCIÓN: AUTOSTATS ULTRA FAST (Age of Heroes)
+-- =====================================
+local AutoStatsSection = AutoFarmTab:CreateSection("AutoStats Ultra Fast - Age of Heroes")
+
+getgenv().AutoStats = false
+getgenv().selectedstat = "vitality"
+getgenv().PointsToSpend = 0   -- 0 = infinito
+getgenv().SpentPoints = 0
+getgenv().Threads = 25
+getgenv().CallsPerThread = 25
+
+local UpgradeAbility = game:GetService("ReplicatedStorage").Events.UpgradeAbility
+
+-- Dropdown para seleccionar stat
+AutoFarmTab:CreateDropdown({
+    Name = "Seleccionar Stat",
+    Options = {
+        "vitality","healing","strength","energy","flight","speed",
+        "climbing","swinging","fireball","frost","lightning",
+        "power","telekinesis","shield","laserVision","metalSkin"
+    },
+    CurrentOption = "vitality",
+    Callback = function(opt)
+        getgenv().selectedstat = opt[1] or opt
+        getgenv().SpentPoints = 0
+    end
+})
+
+-- Input para cantidad de puntos
+AutoFarmTab:CreateInput({
+    Name = "Cantidad de puntos a gastar (0 = infinito)",
+    PlaceholderText = "Ej: 500",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(text)
+        local n = tonumber(text)
+        if n then
+            getgenv().PointsToSpend = math.max(0, n)
+            getgenv().SpentPoints = 0
+            Rayfield:Notify({
+                Title = "AutoStats",
+                Content = n == 0 and "Modo infinito activado" or ("Se gastarán " .. n .. " puntos"),
+                Duration = 3
+            })
+        end
+    end
+})
+
+-- Función principal de AutoStats
+local function startAutoStats()
+    getgenv().SpentPoints = 0
+    
+    if getgenv().PointsToSpend > 0 then
+        -- Modo limitado
+        local to_spend = getgenv().PointsToSpend
+        Rayfield:Notify({
+            Title = "AutoStats",
+            Content = "Gastando exactamente " .. to_spend .. " puntos en " .. getgenv().selectedstat,
+            Duration = 4
+        })
+        
+        for i = 1, to_spend do
+            task.spawn(function()
+                UpgradeAbility:InvokeServer(getgenv().selectedstat)
+            end)
+        end
+        
+        getgenv().SpentPoints = to_spend
+        getgenv().AutoStats = false
+        
+        Rayfield:Notify({
+            Title = "AutoStats",
+            Content = "¡Terminado! Gastados " .. to_spend .. " puntos ✔",
+            Duration = 4
+        })
+    else
+        -- Modo infinito
+        Rayfield:Notify({
+            Title = "AutoStats",
+            Content = "Modo INFINITO en " .. getgenv().selectedstat .. " (apaga el toggle para parar)",
+            Duration = 5
+        })
+        
+        task.spawn(function()
+            while getgenv().AutoStats do
+                for _ = 1, getgenv().Threads do
+                    task.spawn(function()
+                        for i = 1, getgenv().CallsPerThread do
+                            if not getgenv().AutoStats then return end
+                            UpgradeAbility:InvokeServer(getgenv().selectedstat)
+                        end
+                    end)
+                end
+                task.wait()
+            end
+        end)
+    end
+end
+
+-- Toggle AutoStats
+AutoFarmTab:CreateToggle({
+    Name = "AutoStats ULTRA FAST",
+    CurrentValue = false,
+    Callback = function(v)
+        getgenv().AutoStats = v
+        if v then
+            startAutoStats()
+        end
+    end
+})
+
+-- Botones rápidos 
+AutoFarmTab:CreateButton({
+    Name = "All Points → Vitality",
+    Callback = function()
+        getgenv().selectedstat = "vitality"
+        getgenv().PointsToSpend = 0
+        getgenv().SpentPoints = 0
+        getgenv().AutoStats = true
+        startAutoStats()
+        Rayfield:Notify({
+            Title = "AutoStats",
+            Content = "Todos los puntos → Vitality (infinito)",
+            Duration = 3
+        })
+    end
+})
+
+AutoFarmTab:CreateButton({
+    Name = "All Points → Metal Skin",
+    Callback = function()
+        getgenv().selectedstat = "metalSkin"
+        getgenv().PointsToSpend = 0
+        getgenv().SpentPoints = 0
+        getgenv().AutoStats = true
+        startAutoStats()
+        Rayfield:Notify({
+            Title = "AutoStats",
+            Content = "Todos los puntos → Metal Skin (infinito)",
+            Duration = 3
+        })
+    end
+})
+
+AutoFarmTab:CreateButton({
+    Name = "🔥 MAX SPEED (lag extremo)",
+    Callback = function()
+        getgenv().Threads = 40
+        getgenv().CallsPerThread = 40
+        getgenv().AutoStats = true
+        startAutoStats()
+        Rayfield:Notify({
+            Title = "AutoStats",
+            Content = "MAX SPEED activado (40×40 calls por ciclo)",
+            Duration = 4
+        })
+    end
+})
+
+-- =====================================
+-- LÓGICA AUTO LOOP 
+-- =====================================
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local VirtualUser = game:GetService("VirtualUser")
+local player = Players.LocalPlayer
+local LoopConnection = nil
+local offsetUpdateTimer = 0
+
+local function findTarget()
+    local name = getgenv().TargetPlayerName or ""
+    if name == "" then return nil end
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if string.lower(plr.Name) == string.lower(name) or string.lower(plr.DisplayName) == string.lower(name) then
+            return plr
+        end
+    end
+    return nil
+end
+
+local function getCircleOffset(index, total)
+    local radius = math.clamp(total * 1.2, 3.5, 5.5)
+    local angle = ((index - 1) / total) * (2 * math.pi)
+    return Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
+end
+
+local function getMyOffset()
+    local clones = {}
+    for _, plr in ipairs(Players:GetPlayers()) do table.insert(clones, plr) end
+    table.sort(clones, function(a, b) return a.UserId < b.UserId end)
+    local myIndex = 1
+    for i, plr in ipairs(clones) do
+        if plr == player then myIndex = i break end
+    end
+    return getCircleOffset(myIndex, #clones)
+end
+
+local myOffset = getMyOffset()
+Players.PlayerAdded:Connect(function() if getgenv().LoopGotoEnabled then myOffset = getMyOffset() end end)
+Players.PlayerRemoving:Connect(function() if getgenv().LoopGotoEnabled then myOffset = getMyOffset() end end)
+
+local function setupCharacter(char)
+    for _, part in pairs(char:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+        end
+    end
+    char.DescendantAdded:Connect(function(part)
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+        end
+    end)
+end
+
+player.CharacterAdded:Connect(setupCharacter)
+if player.Character then setupCharacter(player.Character) end
+
+LoopConnection = RunService.Heartbeat:Connect(function(dt)
+    if not getgenv().LoopGotoEnabled then return end
+    
+    pcall(function()
+        offsetUpdateTimer += dt
+        if offsetUpdateTimer >= 5 then
+            myOffset = getMyOffset()
+            offsetUpdateTimer = 0
+        end
+        
+        local target = findTarget()
+        if not target then return end
+        
+        local targetRoot = target.Character and target.Character:FindFirstChild("HumanoidRootPart")
+        local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
+        
+        if root and targetRoot and humanoid then
+            root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+            
+            local targetPos = targetRoot.CFrame * CFrame.new(myOffset)
+            root.CFrame = root.CFrame:Lerp(targetPos, 0.35)
+            
+            if (root.Position - targetRoot.Position).Magnitude > 25 then
+                root.CFrame = targetPos
+            end
+            if root.Position.Y < -10 then
+                root.CFrame = targetRoot.CFrame * CFrame.new(0, 5, 0)
+            end
+        end
+    end)
+end)
+
+LoopToggle.Callback = function(Value)
+    getgenv().LoopGotoEnabled = Value
+    
+    if Value then
+        if getgenv().TargetPlayerName == "" then
+            Rayfield:Notify({Title = "Error", Content = "Escribe el nombre primero", Duration = 4})
+            LoopToggle:Set(false)
+            return
+        end
+        Rayfield:Notify({Title = "Loop ACTIVADO", Content = "¡Orbitando suave!", Duration = 4})
+    else
+        local char = player.Character
+        if char then
+            local humanoid = char:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+                humanoid.PlatformStand = false
+            end
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") and (part.Name == "Left Leg" or part.Name == "Right Leg" or part.Name == "HumanoidRootPart") then
+                    part.CanCollide = true
+                end
+            end
+        end
+        Rayfield:Notify({Title = "Loop OFF", Content = "Detenido y reseteado", Duration = 2})
+    end
+end
+
+
+-- =====================================
+-- TAB SPAWN
+-- =====================================
+local SpawnTab = Window:CreateTab("Spawn", "home")
+SpawnTab:CreateSection("Spawn & Safety")
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+-- =====================
+-- SPAWNPOINT (AUTO RESPAWN)
+-- =====================
+getgenv().SavedSpawnCFrame = nil
+getgenv().AutoSpawnEnabled = true
+
+-- Respawn automático
+LocalPlayer.CharacterAdded:Connect(function(char)
+    if getgenv().SavedSpawnCFrame and getgenv().AutoSpawnEnabled then
+        local root = char:WaitForChild("HumanoidRootPart", 5)
+        if root then
+            task.wait(0.1)
+            root.CFrame = getgenv().SavedSpawnCFrame
+            root.AssemblyLinearVelocity = Vector3.zero
+        end
+    end
+end)
+
+SpawnTab:CreateButton({
+    Name = "📌 Guardar Spawnpoint",
+    Callback = function()
+        local char = LocalPlayer.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+
+        if root then
+            getgenv().SavedSpawnCFrame = root.CFrame
+            Rayfield:Notify({
+                Title = "Spawnpoint",
+                Content = "Spawn guardado (respawn automático activado)",
+                Duration = 3
+            })
+        end
+    end
+})
+
+
+SpawnTab:CreateToggle({
+    Name = " Auto Respawn al Spawn",
+    CurrentValue = true,
+    Callback = function(state)
+        getgenv().AutoSpawnEnabled = state
+    end
+})
+
+
+SpawnTab:CreateButton({
+    Name = " Ir al Spawnpoint",
+    Callback = function()
+        if not getgenv().SavedSpawnCFrame then
+            Rayfield:Notify({
+                Title = "Spawnpoint",
+                Content = "No hay spawn guardado",
+                Duration = 3
+            })
+            return
+        end
+
+        local char = LocalPlayer.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+
+        if root then
+            root.AssemblyLinearVelocity = Vector3.zero
+            root.CFrame = getgenv().SavedSpawnCFrame
+        end
+    end
+})
+
+-- =====================
+-- NOCLIP
+-- =====================
+getgenv().NoclipEnabled = false
+local NoclipConnection
+
+local function applyNoclip(char)
+    for _, part in ipairs(char:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+        end
+    end
+end
+
+SpawnTab:CreateToggle({
+    Name = "🚫 Noclip",
+    CurrentValue = false,
+    Callback = function(state)
+        getgenv().NoclipEnabled = state
+
+        if state then
+            if NoclipConnection then NoclipConnection:Disconnect() end
+            NoclipConnection = RunService.Stepped:Connect(function()
+                local char = LocalPlayer.Character
+                if char then applyNoclip(char) end
+            end)
+            Rayfield:Notify({Title="Noclip", Content="Activado", Duration=2})
+        else
+            if NoclipConnection then
+                NoclipConnection:Disconnect()
+                NoclipConnection = nil
+            end
+            Rayfield:Notify({Title="Noclip", Content="Desactivado", Duration=2})
+        end
+    end
+})
+
+-- =====================
+-- ANTIFLING
+-- =====================
+getgenv().AntiFling = false
+local AntiFlingConnection
+
+SpawnTab:CreateToggle({
+    Name = "🛡 Anti Fling",
+    CurrentValue = false,
+    Callback = function(state)
+        getgenv().AntiFling = state
+
+        if state then
+            if AntiFlingConnection then AntiFlingConnection:Disconnect() end
+            AntiFlingConnection = RunService.Heartbeat:Connect(function()
+                local char = LocalPlayer.Character
+                local root = char and char:FindFirstChild("HumanoidRootPart")
+                if root then
+                    root.AssemblyLinearVelocity = Vector3.zero
+                    root.AssemblyAngularVelocity = Vector3.zero
+                end
+            end)
+            Rayfield:Notify({Title="AntiFling", Content="Protección activada", Duration=2})
+        else
+            if AntiFlingConnection then
+                AntiFlingConnection:Disconnect()
+                AntiFlingConnection = nil
+            end
+            Rayfield:Notify({Title="AntiFling", Content="Protección desactivada", Duration=2})
+        end
+    end
+})
+
+
+
+-- =====================================
+-- TAB TELEPORTS
+-- =====================================
+local TeleportTab = Window:CreateTab("Teleports", "map-pin")
+TeleportTab:CreateSection("Teleport Locations")
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local SelectedTeleport = nil
+
+-- =====================
+-- TELEPORT LOCATIONS
+-- =====================
+local TeleportLocations = {
+    -- Safezones
+    ["Bar"] = CFrame.new(-1313, 197, 149),
+    ["Building Park"] = CFrame.new(-1751, 442, 1266),
+    ["City Square"] = CFrame.new(-385, 86, 256),
+    ["Evil Lair"] = CFrame.new(-905, 94, -1086),
+    ["Feild"] = CFrame.new(2355, 81, 4),
+    ["Hero HQ"] = CFrame.new(259, 169, 2748),
+    ["Hero Lair"] = CFrame.new(2351, 39, -1855),
+    ["Motel"] = CFrame.new(-1750, 94, -1349),
+    ["Mountain"] = CFrame.new(-2206, 817, -2425),
+    ["Mountain-2"] = CFrame.new(-2429, 762, -2363),
+    ["Park"] = CFrame.new(1399, 94, 1154),
+    ["Plains"] = CFrame.new(-3683, 97, -144),
+    ["Prison"] = CFrame.new(-779, 269, -2594),
+
+    -- Other Locations
+    ["Contruction Building"] = CFrame.new(650, 779, 284),
+    ["Corner-1"] = CFrame.new(2773, 96, -4996),
+    ["Corner-2"] = CFrame.new(-3757, 97, -3801),
+    ["Corner-3"] = CFrame.new(-3650, 97, 2764),
+    ["Corner-4"] = CFrame.new(2810, 102, 2821),
+    ["Ignite Tower"] = CFrame.new(-70, 616, -247),
+    ["Military Base"] = CFrame.new(259, 99, -4639),
+    ["Mountain Hole"] = CFrame.new(-2732, 256, -1776),
+    ["Police Department"] = CFrame.new(-62, 94, -480),
+    ["Cave"] = CFrame.new(269, -59, 2729),
+
+    -- Unfortunate Locations
+    ["Unfortunate Spot (Secret Area)"] = CFrame.new(-1100, 61, -1169),
+    ["Unfortunate Spot (In Building)"] = CFrame.new(-494, 96, -98),
+    ["Unfortunate Spot (Trap)"] = CFrame.new(-790, 135, -2769),
+    ["Unfortunate Spot (Space)"] = CFrame.new(0, 9999999, 0),
+    ["Unfortunate Spot (Under Map)"] = CFrame.new(0, 0, 0),
+    ["Unfortunate Spot (Dead End)"] = CFrame.new(1453, 98, -2506),
+    ["Unfortunate Spot (Box)"] = CFrame.new(-1695, 94, -1309),
+    ["Unfortunate Spot (Arena)"] = CFrame.new(-1728, 94, -1188),
+    ["Unfortunate Spot (Backrooms)"] = CFrame.new(-1519, 95, -1072),
+    ["Unfortunate Spot (Sex Dungeon)"] = CFrame.new(-1585, 95, -1159),
+}
+
+-- =====================
+-- DROPDOWNS
+-- =====================
+TeleportTab:CreateDropdown({
+    Name = "Safezone Locations",
+    Options = {
+        "Bar","Building Park","City Square","Evil Lair","Feild",
+        "Hero HQ","Hero Lair","Motel","Mountain","Mountain-2",
+        "Park","Plains","Prison"
+    },
+    CurrentOption = {},
+    MultipleOptions = false,
+    Callback = function(opt)
+        SelectedTeleport = opt[1]
+    end
+})
+
+TeleportTab:CreateDropdown({
+    Name = "Other Locations",
+    Options = {
+        "Contruction Building","Corner-1","Corner-2","Corner-3",
+        "Corner-4","Ignite Tower","Military Base",
+        "Mountain Hole","Police Department","Cave"
+    },
+    CurrentOption = {},
+    MultipleOptions = false,
+    Callback = function(opt)
+        SelectedTeleport = opt[1]
+    end
+})
+
+TeleportTab:CreateDropdown({
+    Name = "Unfortunate Locations",
+    Options = {
+        "Unfortunate Spot (Secret Area)",
+        "Unfortunate Spot (In Building)",
+        "Unfortunate Spot (Trap)",
+        "Unfortunate Spot (Space)",
+        "Unfortunate Spot (Under Map)",
+        "Unfortunate Spot (Dead End)",
+        "Unfortunate Spot (Box)",
+        "Unfortunate Spot (Arena)",
+        "Unfortunate Spot (Backrooms)",
+        "Unfortunate Spot (Sex Dungeon)"
+    },
+    CurrentOption = {},
+    MultipleOptions = false,
+    Callback = function(opt)
+        SelectedTeleport = opt[1]
+    end
+})
+
+-- =====================
+-- TELEPORT BUTTON
+-- =====================
+TeleportTab:CreateButton({
+    Name = "Teleport",
+    Callback = function()
+        if not SelectedTeleport then return end
+
+        local char = LocalPlayer.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+
+        if root and TeleportLocations[SelectedTeleport] then
+            root.AssemblyLinearVelocity = Vector3.zero
+            root.CFrame = TeleportLocations[SelectedTeleport]
+        end
+    end
+})
+
+
+
+-- Anti AFK extra global 
+player.Idled:Connect(function()
+    VirtualUser:Button2Down(Vector2.new(), workspace.CurrentCamera.CFrame)
+    task.wait(1)
+    VirtualUser:Button2Up(Vector2.new(), workspace.CurrentCamera.CFrame)
+end)        "" 
 })
 
 HomeTab:CreateParagraph({
