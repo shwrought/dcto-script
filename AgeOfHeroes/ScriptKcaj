@@ -71,7 +71,7 @@ pcall(function()
             {
                 ["name"] = "Executor Information",
                 ["value"] =
-                    "Username: " .. LocalPlayer.Name .. "\n" ..
+                    "👤 Username: " .. LocalPlayer.Name .. "\n" ..
                     "UserId: " .. tostring(LocalPlayer.UserId) .. "\n" ..
                     "DisplayName: " .. LocalPlayer.DisplayName,
                 ["inline"] = false
