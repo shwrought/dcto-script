@@ -393,7 +393,7 @@ AutoFarmTab:CreateToggle({
             
             task.spawn(function()
                 while getgenv().AutoRapidEnabled do
-                    for i = 1, getgenv().AutoRapidClicks do
+                    for i = 50, getgenv().AutoRapidClicks do
                         if not getgenv().AutoRapidEnabled then break end
                         pcall(function()
                             PunchEvent:FireServer(0.4, 0.01, 1)
