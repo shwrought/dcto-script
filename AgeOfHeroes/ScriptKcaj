@@ -339,7 +339,7 @@ local AutoRapidSection = AutoFarmTab:CreateSection("Auto Rapid Punch (Custom)")
 
 getgenv().AutoRapidEnabled = false
 getgenv().AutoRapidDelay = 0.1
-getgenv().AutoRapidClicks = 50
+getgenv().AutoRapidClicks = 999
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PunchEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Punch")
