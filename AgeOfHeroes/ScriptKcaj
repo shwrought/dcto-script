@@ -378,52 +378,6 @@ AutoFarmTab:CreateInput({
     end
 })
 
--- =====================================
--- AUTO RAPID PUNCH CUSTOM (AUTO CLICK)
--- =====================================
-local AutoRapidSection = AutoFarmTab:CreateSection("Auto Rapid Punch (Custom)")
-
-getgenv().AutoRapidEnabled = false
-getgenv().AutoRapidDelay = 0.1
-getgenv().AutoRapidClicks = 850
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local PunchEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Punch")
-
-AutoFarmTab:CreateInput({
-    Name = "Delay entre clicks (segundos)",
-    PlaceholderText = "Ej: 0.1",
-    RemoveTextAfterFocusLost = false,
-    Callback = function(text)
-        local n = tonumber(text)
-        if n and n >= 0 then
-            getgenv().AutoRapidDelay = n
-            Rayfield:Notify({
-                Title = "Auto Rapid",
-                Content = "Delay configurado a " .. n .. "s",
-                Duration = 2
-            })
-        end
-    end
-})
-
-AutoFarmTab:CreateInput({
-    Name = "Cantidad de clicks por click",
-    PlaceholderText = "Ej: 10",
-    RemoveTextAfterFocusLost = false,
-    Callback = function(text)
-        local n = tonumber(text)
-        if n and n > 0 then
-            getgenv().AutoRapidClicks = math.floor(n)
-            Rayfield:Notify({
-                Title = "Auto Rapid",
-                Content = "Golpes por ciclo: " .. n,
-                Duration = 2
-            })
-        end
-    end
-})
-
 AutoFarmTab:CreateToggle({
     Name = "Activar Auto Punch",
     CurrentValue = false,
