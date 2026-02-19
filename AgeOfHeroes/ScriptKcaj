@@ -388,16 +388,21 @@ AutoFarmTab:CreateToggle({
             task.spawn(function()
                 while getgenv().AutoRapidEnabled do
                     
-                    -- MISMA LÓGICA QUE EL TOOL
-                    for i = 1, 10 do
-                        task.spawn(function()
-                            for j = 1, 80 do
-                                if not getgenv().AutoRapidEnabled then return end
-                                pcall(function()
-                                    PunchEvent:FireServer(0.4, 0.01, 1)
-                                end)
-                            end
-                        end)
+                    -- 800 golpes totales
+                    local totalHits = 800
+                    local batchSize = 40  -- envía 40 por micro-lote
+                    local batches = totalHits / batchSize
+                    
+                    for i = 1, batches do
+                        if not getgenv().AutoRapidEnabled then break end
+                        
+                        for j = 1, batchSize do
+                            pcall(function()
+                                PunchEvent:FireServer(0.4, 0.01, 1)
+                            end)
+                        end
+                        
+                        task.wait() -- cede un frame (evita congelamiento)
                     end
                     
                     task.wait(0.12) -- mismo cooldown del tool
@@ -406,6 +411,7 @@ AutoFarmTab:CreateToggle({
         end
     end
 })
+
 
 
 
