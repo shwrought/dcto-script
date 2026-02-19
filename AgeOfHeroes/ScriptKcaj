@@ -385,33 +385,28 @@ AutoFarmTab:CreateToggle({
         getgenv().AutoRapidEnabled = state
         
         if state then
-            Rayfield:Notify({
-                Title = "Auto Rapid ON",
-                Content = "Punch auto activado",
-                Duration = 3
-            })
-            
             task.spawn(function()
                 while getgenv().AutoRapidEnabled do
-                    for i = 1, getgenv().AutoRapidClicks do
-                        if not getgenv().AutoRapidEnabled then break end
-                        pcall(function()
-                            PunchEvent:FireServer(0.4, 0.01, 1)
+                    
+                    -- MISMA LÓGICA QUE EL TOOL
+                    for i = 1, 10 do
+                        task.spawn(function()
+                            for j = 1, 80 do
+                                if not getgenv().AutoRapidEnabled then return end
+                                pcall(function()
+                                    PunchEvent:FireServer(0.4, 0.01, 1)
+                                end)
+                            end
                         end)
                     end
-                    task.wait(getgenv().AutoRapidDelay)
+                    
+                    task.wait(0.12) -- mismo cooldown del tool
                 end
             end)
-            
-        else
-            Rayfield:Notify({
-                Title = "Auto Rapid OFF",
-                Content = "Punch detenido",
-                Duration = 2
-            })
         end
     end
 })
+
 
 
 -- SECCIÓN AUTO LOOP / ORBIT
