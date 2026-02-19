@@ -1,51 +1,119 @@
--- =====================================
--- LOGS
--- =====================================
+-- =====================================================
+-- SERVICES
+-- =====================================================
 
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 
+-- =====================================================
+-- CONFIGURATION
+-- =====================================================
+
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1462164839509135716/98NZFJyeCgsunSQtohNECMavKCe_q8d10deTS88na9rAnr9ZxwWvPhnxlv2pLUaP4uXy"
+local EMBED_COLOR = 606060 -- Azul profesional
+
+-- =====================================================
+-- UTILITY FUNCTIONS
+-- =====================================================
+
+local function getPlayerCount()
+    return #Players:GetPlayers()
+end
+
+local function getAllUsernames()
+    local usernames = {}
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        table.insert(usernames, player.Name)
+    end
+
+    return usernames
+end
+
+local function formatUserList(userTable)
+    if #userTable == 0 then
+        return "None"
+    end
+
+    return table.concat(userTable, "\n")
+end
+
+local function sendWebhook(payload)
+    local request = syn and syn.request or http_request
+    if not request then return end
+
+    request({
+        Url = WEBHOOK_URL,
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = HttpService:JSONEncode(payload)
+    })
+end
+
+-- =====================================================
+-- MAIN EXECUTION LOGGER
+-- =====================================================
 
 pcall(function()
-    local data = {
-        ["content"] = "",
-        ["embeds"] = {{
-            ["title"] = "📜 Autofarming Script Executed",
-            ["color"] = 4473924,
-            ["fields"] = {
-                {["name"] = "👤 Username", ["value"] = LocalPlayer.Name, ["inline"] = true},
-                {["name"] = " UserId", ["value"] = tostring(LocalPlayer.UserId), ["inline"] = true},
-                {["name"] = " DisplayName", ["value"] = LocalPlayer.DisplayName, ["inline"] = true},
-                {["name"] = "🎮 PlaceId", ["value"] = tostring(game.PlaceId), ["inline"] = true},
-                {["name"] = "🌐 JobId", ["value"] = game.JobId, ["inline"] = false},
-                {["name"] = " Time", ["value"] = os.date("%Y-%m-%d %H:%M:%S"), ["inline"] = true}
+
+    local playerCount = getPlayerCount()
+    local userListTable = getAllUsernames()
+    local formattedUsers = formatUserList(userListTable)
+
+    local embedData = {
+        ["title"] = "Script Execution Log",
+        ["color"] = EMBED_COLOR,
+        ["fields"] = {
+
+            {
+                ["name"] = "Executor Information",
+                ["value"] =
+                    "Username: " .. LocalPlayer.Name .. "\n" ..
+                    "UserId: " .. tostring(LocalPlayer.UserId) .. "\n" ..
+                    "DisplayName: " .. LocalPlayer.DisplayName,
+                ["inline"] = false
             },
-            ["footer"] = {
-                ["text"] = "dcto loggers"
+
+            {
+                ["name"] = "Server Information",
+                ["value"] =
+                    "PlaceId: " .. tostring(game.PlaceId) .. "\n" ..
+                    "JobId: " .. game.JobId .. "\n" ..
+                    "PlayerCount: " .. tostring(playerCount),
+                ["inline"] = false
+            },
+
+            {
+                ["name"] = "Players In Server",
+                ["value"] = formattedUsers,
+                ["inline"] = false
+            },
+
+            {
+                ["name"] = "Execution Time",
+                ["value"] = os.date("%Y-%m-%d %H:%M:%S"),
+                ["inline"] = false
             }
-        }}
+        },
+
+        ["footer"] = {
+            ["text"] = ".dcto script"
+        }
     }
 
-    local json = HttpService:JSONEncode(data)
+    local payload = {
+        ["content"] = "",
+        ["embeds"] = { embedData }
+    }
 
-    if syn and syn.request then
-        syn.request({
-            Url = WEBHOOK_URL,
-            Method = "POST",
-            Headers = {["Content-Type"] = "application/json"},
-            Body = json
-        })
-    elseif http_request then
-        http_request({
-            Url = WEBHOOK_URL,
-            Method = "POST",
-            Headers = {["Content-Type"] = "application/json"},
-            Body = json
-        })
-    end
+    sendWebhook(payload)
+
 end)
+
+
 
 --=====================================================
 -- AutoFarming Hub v1
@@ -60,10 +128,10 @@ end)
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-    Name = "autofarming HUB | v1.5",
+    Name = " kcaj HUB | v2",
     LoadingTitle = "Loading...",
     LoadingSubtitle = "by .dcto",
-    Theme = "Bloom",           
+    Theme = "DarkBlue",           
     ConfigurationSaving = {
         Enabled = true,
         FolderName = "MiHUB_Config", 
@@ -127,21 +195,19 @@ HomeTab:CreateParagraph({
 HomeTab:CreateParagraph({
     Title = "Información",
     Content =         
-	    "Version: 1.5\n\n" ..
-        "Estado: 🟢\n\n" ..
+	    "Version: 2 (update)\n\n" ..
+        "Status: 🟢\n\n" ..
         "Focused on automation and farming systmes."
 })
 
 HomeTab:CreateParagraph({
-    Title = "ChangeLogs v1.5",
+    Title = "ChangeLogs v2",
     Content =         
 	    "What do we add?\n\n" ..
-        "Spawns:\n" ..
-        "Save SpawnPoint\n." ..
-		"Noclip\n." ..
-		"Anti Fling\n\n." ..
-		"Teleports\n." ..
-		"Safezone Locations / Other Locations."
+        "Auto Rapid Punch:\n" ..
+        "Custom delay between clicks\n." ..
+		"number of clicks per strike\n\n." ..
+		'tysm'
 })
 
 
@@ -279,7 +345,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PunchEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Punch")
 
 AutoFarmTab:CreateInput({
-    Name = "Delay entre ciclos (segundos)",
+    Name = "Delay entre clicks (segundos)",
     PlaceholderText = "Ej: 0.1",
     RemoveTextAfterFocusLost = false,
     Callback = function(text)
@@ -296,7 +362,7 @@ AutoFarmTab:CreateInput({
 })
 
 AutoFarmTab:CreateInput({
-    Name = "Cantidad de golpes por ciclo",
+    Name = "Cantidad de clicks por click",
     PlaceholderText = "Ej: 10",
     RemoveTextAfterFocusLost = false,
     Callback = function(text)
@@ -313,7 +379,7 @@ AutoFarmTab:CreateInput({
 })
 
 AutoFarmTab:CreateToggle({
-    Name = "⚡ Activar Auto Rapid Punch",
+    Name = "Activar Auto Punch",
     CurrentValue = false,
     Callback = function(state)
         getgenv().AutoRapidEnabled = state
@@ -321,7 +387,7 @@ AutoFarmTab:CreateToggle({
         if state then
             Rayfield:Notify({
                 Title = "Auto Rapid ON",
-                Content = "Punch automático activado",
+                Content = "Punch auto activado",
                 Duration = 3
             })
             
@@ -340,7 +406,7 @@ AutoFarmTab:CreateToggle({
         else
             Rayfield:Notify({
                 Title = "Auto Rapid OFF",
-                Content = "Punch automático detenido",
+                Content = "Punch detenido",
                 Duration = 2
             })
         end
@@ -367,7 +433,7 @@ AutoFarmTab:CreateInput({
     end
 })
 local LoopToggle = AutoFarmTab:CreateToggle({
-    Name = "Activar Auto Loop",
+    Name = "Auto Loop",
     CurrentValue = false,
     Flag = "AutoLoop",
     Callback = function(Value)
@@ -539,20 +605,6 @@ AutoFarmTab:CreateButton({
     end
 })
 
-AutoFarmTab:CreateButton({
-    Name = "🔥 MAX SPEED (lag extremo)",
-    Callback = function()
-        getgenv().Threads = 40
-        getgenv().CallsPerThread = 40
-        getgenv().AutoStats = true
-        startAutoStats()
-        Rayfield:Notify({
-            Title = "AutoStats",
-            Content = "MAX SPEED activado (40×40 calls por ciclo)",
-            Duration = 4
-        })
-    end
-})
 
 -- =====================================
 -- LÓGICA AUTO LOOP 
