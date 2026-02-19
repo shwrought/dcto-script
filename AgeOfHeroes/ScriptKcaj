@@ -378,6 +378,52 @@ AutoFarmTab:CreateInput({
     end
 })
 
+-- =====================================
+-- AUTO RAPID PUNCH CUSTOM (AUTO CLICK)
+-- =====================================
+local AutoRapidSection = AutoFarmTab:CreateSection("Auto Rapid Punch (Custom)")
+
+getgenv().AutoRapidEnabled = false
+getgenv().AutoRapidDelay = 0.1
+getgenv().AutoRapidClicks = 850
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PunchEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Punch")
+
+AutoFarmTab:CreateInput({
+    Name = "Delay entre clicks (segundos)",
+    PlaceholderText = "Ej: 0.1",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(text)
+        local n = tonumber(text)
+        if n and n >= 0 then
+            getgenv().AutoRapidDelay = n
+            Rayfield:Notify({
+                Title = "Auto Rapid",
+                Content = "Delay configurado a " .. n .. "s",
+                Duration = 2
+            })
+        end
+    end
+})
+
+AutoFarmTab:CreateInput({
+    Name = "Cantidad de clicks por click",
+    PlaceholderText = "Ej: 10",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(text)
+        local n = tonumber(text)
+        if n and n > 0 then
+            getgenv().AutoRapidClicks = math.floor(n)
+            Rayfield:Notify({
+                Title = "Auto Rapid",
+                Content = "Golpes por ciclo: " .. n,
+                Duration = 2
+            })
+        end
+    end
+})
+
 AutoFarmTab:CreateToggle({
     Name = "Activar Auto Punch",
     CurrentValue = false,
@@ -385,33 +431,33 @@ AutoFarmTab:CreateToggle({
         getgenv().AutoRapidEnabled = state
         
         if state then
+            Rayfield:Notify({
+                Title = "Auto Rapid ON",
+                Content = "Punch auto activado",
+                Duration = 3
+            })
+            
             task.spawn(function()
                 while getgenv().AutoRapidEnabled do
-                    
-                    -- 800 golpes totales
-                    local totalHits = 800
-                    local batchSize = 40  -- envía 40 por micro-lote
-                    local batches = totalHits / batchSize
-                    
-                    for i = 1, batches do
+                    for i = 1, getgenv().AutoRapidClicks do
                         if not getgenv().AutoRapidEnabled then break end
-                        
-                        for j = 1, batchSize do
-                            pcall(function()
-                                PunchEvent:FireServer(0.4, 0.01, 1)
-                            end)
-                        end
-                        
-                        task.wait() -- cede un frame (evita congelamiento)
+                        pcall(function()
+                            PunchEvent:FireServer(0.4, 0.01, 1)
+                        end)
                     end
-                    
-                    task.wait(0.12) -- mismo cooldown del tool
+                    task.wait(getgenv().AutoRapidDelay)
                 end
             end)
+            
+        else
+            Rayfield:Notify({
+                Title = "Auto Rapid OFF",
+                Content = "Punch detenido",
+                Duration = 2
+            })
         end
     end
 })
-
 
 
 
